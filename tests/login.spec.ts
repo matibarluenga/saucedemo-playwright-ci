@@ -23,9 +23,11 @@ import { test, expect } from "@playwright/test";
 //2.try to login with invalid password
 
 test("successful login", async ({ page }) => {
-  await page.goto("");
-  await page.getByPlaceholder("username").fill("standard_user");
-  await page.getByPlaceholder("password").fill("secret_sauce");
-  await page.locator("#login-button").click();
+  await page.goto("/");
+  await page.getByTestId("username").fill("standard_user");
+  await page.getByTestId("password").fill("secret_sauce");
+  await page.getByTestId("login-button").click();
+
   await expect(page).toHaveURL("/inventory.html");
+  await expect(page.getByTestId("title")).toHaveText("Products");
 });
