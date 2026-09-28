@@ -56,9 +56,30 @@ test("e2e login and add a product to the cart", async ({ page }) => {
   // fresh browser context → cart starts empty
   await expect(cartBadge).toHaveCount(0);
 
-  // add a product to the cart
+  // remember the price and add a product to the cart
+  const priceSauceLabsBackpack = await page
+    .getByTestId("inventory-item")
+    .filter({ hasText: "Sauce Labs Backpack" })
+    .getByTestId("inventory-item-price")
+    .textContent();
+  expect(priceSauceLabsBackpack).not.toBeNull();
+
   await page.getByTestId("add-to-cart-sauce-labs-backpack").click();
   await expect(page.getByTestId("remove-sauce-labs-backpack")).toBeVisible();
   await expect(cartBadge).toHaveText("1");
+
+  // go to the cart and verify we landed there
+  await page.getByTestId("shopping-cart-link").click();
+  await expect(page).toHaveURL("/cart.html");
+  await expect(page.getByTestId("title")).toHaveText("Your Cart");
+
+  // verify the product is in the cart and its price matches the inventory
+  const backpackInCart = page
+    .getByTestId("inventory-item")
+    .filter({ hasText: "Sauce Labs Backpack" });
+
+  await expect(backpackInCart).toBeVisible();
+  await expect(backpackInCart.getByTestId("inventory-item-price")).toHaveText(
+    priceSauceLabsBackpack!,
+  );
 });
-//check the added products
