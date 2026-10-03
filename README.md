@@ -2,6 +2,8 @@
 
 [![Playwright Tests](https://github.com/matibarluenga/saucedemo-playwright-ci/actions/workflows/playwright.yml/badge.svg)](https://github.com/matibarluenga/saucedemo-playwright-ci/actions/workflows/playwright.yml)
 
+**[View the latest test report](https://matibarluenga.github.io/saucedemo-playwright-ci/)**: HTML report of the last run on `main`, published to GitHub Pages.
+
 End-to-end UI test automation for [SauceDemo](https://www.saucedemo.com), a demo e-commerce site by Sauce Labs. The suite covers authentication and the full purchase flow, and runs automatically on GitHub Actions on every push and pull request.
 
 ## Tech stack
@@ -90,7 +92,9 @@ The pipeline:
 1. Runs on a pinned `ubuntu-24.04` runner for reproducible builds
 2. Installs dependencies with `npm ci` and the Chromium browser
 3. Runs the full test suite (with up to 2 retries on CI, so flaky tests become visible in the report)
-4. Uploads the HTML report as the `playwright-report` artifact, kept for 30 days
+4. Reports failures as annotations on the run page
+5. Uploads the HTML report as the `playwright-report` artifact, kept for 30 days
+6. On `main`, publishes the same report to [GitHub Pages](https://matibarluenga.github.io/saucedemo-playwright-ci/), so the latest results can be viewed without downloading anything
 
 ## Roadmap
 
