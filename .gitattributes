@@ -1,0 +1,6 @@
+# Normalizar finales de línea: LF en el repo y en la copia de trabajo
+* text=auto eol=lf
+
+# Archivos binarios: no tocarlos nunca
+*.png binary
+*.jpg binary
