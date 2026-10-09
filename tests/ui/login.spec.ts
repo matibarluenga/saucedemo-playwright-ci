@@ -1,67 +1,60 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "../../pages/LoginPage";
+import { InventoryPage } from "../../pages/InventoryPage";
+
+let loginPage: LoginPage;
+let inventoryPage: InventoryPage;
+
+test.beforeEach(async ({ page }) => {
+  loginPage = new LoginPage(page);
+  inventoryPage = new InventoryPage(page);
+  await loginPage.goto();
+});
 
 test("successful login", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("username").fill("standard_user");
-  await page.getByTestId("password").fill("secret_sauce");
-  await page.getByTestId("login-button").click();
+  await loginPage.login("standard_user", "secret_sauce");
 
   await expect(page).toHaveURL("/inventory.html");
-  await expect(page.getByTestId("title")).toHaveText("Products");
+  await expect(inventoryPage.title).toHaveText("Products");
 });
 
 test("invalid password", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("username").fill("standard_user");
-  await page.getByTestId("password").fill("incorrectPass123");
-  await page.getByTestId("login-button").click();
+  await loginPage.login("standard_user", "incorrectPass123");
 
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("error")).toContainText(
+  await expect(loginPage.errorMessage).toContainText(
     "Username and password do not match any user in this service",
   );
 });
 
-//test empty password
 test("empty password", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("username").fill("standard_user");
-  await page.getByTestId("password").fill("");
-  await page.getByTestId("login-button").click();
+  await loginPage.login("standard_user", "");
 
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("error")).toContainText("Password is required");
+  await expect(loginPage.errorMessage).toContainText("Password is required");
 });
 
 test("empty username", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("password").fill("secret_sauce");
-  await page.getByTestId("login-button").click();
+  await loginPage.login("", "secret_sauce");
 
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("error")).toContainText("Username is required");
+  await expect(loginPage.errorMessage).toContainText("Username is required");
 });
 
 test("non-existent username", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("username").fill("non_existent_user");
-  await page.getByTestId("password").fill("secret_sauce");
-  await page.getByTestId("login-button").click();
+  await loginPage.login("non_existent_user", "secret_sauce");
 
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("error")).toContainText(
+  await expect(loginPage.errorMessage).toContainText(
     "Username and password do not match any user in this service",
   );
 });
 
 test("locked out user", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("username").fill("locked_out_user");
-  await page.getByTestId("password").fill("secret_sauce");
-  await page.getByTestId("login-button").click();
+  await loginPage.login("locked_out_user", "secret_sauce");
 
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("error")).toContainText(
+  await expect(loginPage.errorMessage).toContainText(
     "Sorry, this user has been locked out.",
   );
 });
@@ -69,10 +62,10 @@ test("locked out user", async ({ page }) => {
 test("protected page redirects to login when not logged in", async ({
   page,
 }) => {
-  await page.goto("/inventory.html");
+  await inventoryPage.goto();
 
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("error")).toContainText(
+  await expect(loginPage.errorMessage).toContainText(
     "You can only access '/inventory.html' when you are logged in.",
   );
 });
